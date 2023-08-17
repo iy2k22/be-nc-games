@@ -9,4 +9,7 @@ if (!process.env.PGDATABASE) {
   throw new Error('PGDATABASE not set');
 }
 
-module.exports = new Pool();
+module.exports = new Pool({
+  username: process.env.PG_USER,
+  password: process.env.PG_USER_PASSWORD
+});
