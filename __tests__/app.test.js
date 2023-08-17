@@ -44,4 +44,41 @@ describe("GET /api/categories", () => {
         const result = await request(app).get('/api/categories');
         expect(result.body.categories).toEqual(testData.categoryData);
     })
+});
+
+describe.only("GET /api", () => {
+    test("returns status code 200", () => {
+        return request(app).get('/api').expect(200);
+    });
+    test("returns an object with key \"endpoints\"", async () => {
+        const result = await request(app).get('/api');
+        expect(result.body.hasOwnProperty("endpoints")).toBe(true);
+    })
+    test("returns an object with available endpoints", async () => {
+        const result = await request(app).get('/api');
+        [
+            "GET /api",
+            "GET /api/categories",
+            "GET /api/reviews"
+        ].forEach((endpoint) => {
+            expect(result.body.endpoints.hasOwnProperty(endpoint)).toBe(true);
+        })
+    })
+    test("all endpoints have a key of \"description\"", async () => {
+        const result = await request(app).get('/api');
+        for (endpoint in result.body.endpoints)
+            expect(result.body.endpoints[endpoint].hasOwnProperty("description")).toBe(true);
+    })
+    test("every endpoint expect \"/api\" has properties of \"queries\" and \"exampleResponse\"", async () => {
+        const result = await request(app).get('/api');
+        for (endpoint in result.body.endpoints)
+            if (endpoint !== "GET /api")
+                ["queries", "exampleResponse"].forEach((prop) => {
+                    expect(result.body.endpoints[endpoint].hasOwnProperty(prop)).toBe(true);
+                })
+    })
+    test("returns correct data", async () => {
+        const result = await request(app).get('/api');
+        expect(result.body.endpoints).toEqual(require('../endpoints.json'));
+    })
 })

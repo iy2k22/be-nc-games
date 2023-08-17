@@ -8,13 +8,15 @@ const {
    handlePsqlErrors
 } = require('./errors');
 const {
-    getCategories
+    getCategories,
+    getEndpoints
 } = require('./controllers');
 
 app.use(cors());
 app.use(express.json());
 
 app.get('/api/categories', getCategories);
+app.get('/api', getEndpoints);
 
 app.all('*', handleInvalidEndpoints);
 app.use(handleCustomErrors);

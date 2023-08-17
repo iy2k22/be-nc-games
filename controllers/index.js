@@ -11,6 +11,11 @@ const getCategories = async (req, res, next) => {
     }
 }
 
+const getEndpoints = async (req, res) => {
+    res.status(200).send({ endpoints: require('../endpoints.json') });
+}
+
 module.exports = {
-    getCategories
+    getCategories,
+    getEndpoints
 }
