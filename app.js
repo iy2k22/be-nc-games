@@ -9,7 +9,8 @@ const {
 } = require('./errors');
 const {
     getCategories,
-    getEndpoints
+    getEndpoints,
+    getReview
 } = require('./controllers');
 
 app.use(cors());
@@ -17,6 +18,7 @@ app.use(express.json());
 
 app.get('/api/categories', getCategories);
 app.get('/api', getEndpoints);
+app.get('/api/reviews/:review_id', getReview);
 
 app.all('*', handleInvalidEndpoints);
 app.use(handleCustomErrors);
