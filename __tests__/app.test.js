@@ -158,3 +158,64 @@ describe("GET /api/reviews/:review_id", () => {
     return request(app).get("/api/reviews/1023").expect(404);
   });
 });
+
+describe.only("GET /api/reviews", () => {
+  test("returns 200", async () => {
+    return request(app).get("/api/reviews").expect(200);
+  })
+  test("returns an object", async () => {
+    const result = await request(app).get("/api/reviews");
+    expect(typeof result.body).toBe("object");
+  })
+  test("object has property \"reviews\"", async () => {
+    const result = await request(app).get("/api/reviews");
+    expect(result.body.hasOwnProperty("reviews")).toBe(true);
+  })
+  test("reviews key has array value", async () => {
+    const result = await request(app).get("/api/reviews");
+    expect(Array.isArray(result.body.reviews)).toBe(true);
+  })
+  test("array contains objects", async () => {
+    const result = await request(app).get("/api/reviews");
+    result.body.reviews.forEach((review) => {
+      expect(typeof review).toBe("object");
+    })
+  })
+  test("object has correct properties", async () => {
+    const result = await request(app).get("/api/reviews");
+    result.body.reviews.forEach((review) => {
+      [
+        'owner',
+        'title',
+        'review_id',
+        'category',
+        'review_img_url',
+        'created_at',
+        'votes',
+        'designer',
+        'comment_count'
+      ].forEach((prop) => {
+        expect(review.hasOwnProperty(prop)).toBe(true);
+      })
+    })
+  })
+  test("object has values of correct types", async () => {
+    const result = await request(app).get("/api/reviews");
+    const types = {
+      owner: 'string',
+      title: 'string',
+      review_id: 'number',
+      category: 'string',
+      review_img_url: 'string',
+      created_at: 'string',
+      votes: 'number',
+      designer: 'string',
+      comment_count: 'number'
+    }
+    result.body.reviews.forEach((review) => {
+      for (prop in types) {
+        expect(typeof review[prop]).toBe(types[prop]);
+      }
+    })
+  })
+})

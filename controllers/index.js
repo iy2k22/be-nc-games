@@ -1,6 +1,7 @@
 const {
     readCategories,
-    readReview
+    readReview,
+    readReviews
 } = require('../models');
 
 const getCategories = async (req, res, next) => {
@@ -33,8 +34,18 @@ const getReview = async (req, res, next) => {
     }
 }
 
+const getReviews = async (req, res, next) => {
+    try {
+        const reviewData = await readReviews();
+        res.status(200).send({ reviews: reviewData });
+    } catch (e) {
+        next(e);
+    }
+}
+
 module.exports = {
     getCategories,
     getEndpoints,
-    getReview
+    getReview,
+    getReviews
 }
