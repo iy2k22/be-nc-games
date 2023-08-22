@@ -287,4 +287,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
     expect(result.status).toBe(404);
     expect(result.body.msg).toBe(`error: no comments for review with id ${bad_id}`);
   })
+  test("returns 400 when invalid id passed in", () => {
+    return request(app).get('/api/reviews/a/comments').expect(400);
+  })
 })
