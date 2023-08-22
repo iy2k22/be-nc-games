@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const resCodes = require('../res_codes.json');
 
 const readCategories = async () => {
   const result = await db.query(`SELECT * FROM categories;`);
@@ -16,7 +17,7 @@ const checkReviewExists = async (review_id) => {
 const readReview = async (review_id) => {
   const doesExist = await checkReviewExists(review_id);
   if (!doesExist)
-    return false;
+    return resCodes.REVIEW_NOT_FOUND;
   const result = await db.query(`SELECT * FROM reviews WHERE review_id=$1;`, [
     review_id,
   ]);
@@ -37,8 +38,19 @@ const readReviews = async () => {
   })
 };
 
+const readCommentsByReview = async (review_id) => {
+  const doesExist = await checkReviewExists(review_id);
+  if (!doesExist)
+    return resCodes.REVIEW_NOT_FOUND;
+  const result = await db.query(`SELECT * FROM comments WHERE review_id=$1 ORDER BY created_at desc;`, [review_id]);
+  if (!result.rows.length)
+    return resCodes.NO_COMMENTS_FOR_REVIEW;
+  return result.rows;
+}
+
 module.exports = {
   readCategories,
   readReview,
-  readReviews
+  readReviews,
+  readCommentsByReview
 };

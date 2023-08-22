@@ -219,3 +219,72 @@ describe("GET /api/reviews", () => {
     })
   })
 })
+
+describe("GET /api/reviews/:review_id/comments", () => {
+  const review_id = 3;
+  test("returns 200", () => {
+    return request(app).get(`/api/reviews/${review_id}/comments`).expect(200);
+  })
+  test("returns an object", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    expect(typeof result.body).toBe("object");
+  })
+  test("returns object with property comment", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    expect(result.body.hasOwnProperty("comments")).toBe(true);
+  })
+  test("comment is an array", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    expect(Array.isArray(result.body.comments)).toBe(true);
+  })
+  test("array contains objects", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    result.body.comments.forEach((comment) => {
+      expect(typeof comment).toBe("object");
+    })
+  })
+  test("object contains correct properties", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    result.body.comments.forEach((comment) => {
+      [
+        "comment_id",
+        "votes",
+        "created_at",
+        "author",
+        "body",
+        "review_id"
+      ].forEach((prop) => {
+        expect(comment.hasOwnProperty(prop)).toBe(true);
+      })
+    })
+  })
+  test("props have correct types", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    result.body.comments.forEach((comment) => {
+      expect(typeof comment.comment_id).toBe("number");
+      expect(typeof comment.votes).toBe("number");
+      expect(typeof comment.created_at).toBe("string");
+      expect(typeof comment.author).toBe("string");
+      expect(typeof comment.body).toBe("string");
+      expect(typeof comment.review_id).toBe("number");
+    })
+  })
+  test("review id is correct", async () => {
+    const result = await request(app).get(`/api/reviews/${review_id}/comments`);
+    result.body.comments.forEach((comment) => {
+      expect(comment.review_id).toBe(review_id);
+    })
+  })
+  test("review with non-existent id returns 404", async () => {
+    const bad_id = 1023;
+    const result = await request(app).get(`/api/reviews/${bad_id}/comments`);
+    expect(result.status).toBe(404);
+    expect(result.body.msg).toBe(`error: review with id ${bad_id} does not exist`);
+  })
+  test("review that doesn't have comments returns 404", async () => {
+    const bad_id = 5;
+    const result = await request(app).get(`/api/reviews/${bad_id}/comments`);
+    expect(result.status).toBe(404);
+    expect(result.body.msg).toBe(`error: no comments for review with id ${bad_id}`);
+  })
+})
