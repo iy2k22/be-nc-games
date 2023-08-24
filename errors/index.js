@@ -8,8 +8,17 @@ const handleCustomErrors = (err, req, res, next) => {
 }
 
 const handlePsqlErrors = (err, req, res, next) => {
-    if (err.code === '22P02') res.status(400).send({ msg: "error: invalid input" });
-    else next(err);
+    switch (err.code) {
+        case '22P02':
+            res.status(400).send({ msg: 'error: invalid input' });
+            break;
+        case '23503':
+            res.status(400).send({ msg: 'error: user not registered'});
+            break;
+        default:
+            next(err);
+            break;
+    }
 }
 
 const handle500Errors = (err, req, res) => {

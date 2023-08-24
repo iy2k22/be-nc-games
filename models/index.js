@@ -48,9 +48,24 @@ const readCommentsByReview = async (review_id) => {
   return result.rows;
 }
 
+const putCommentOnReview = async (comment) => {
+  const doesExist = await checkReviewExists(comment.review_id);
+  if (!doesExist) return resCodes.REVIEW_NOT_FOUND;
+  await db.query(
+    `INSERT INTO comments (body, author, review_id)
+  VALUES ($1, $2, $3);`,
+    [comment.body, comment.username, comment.review_id]
+  );
+  return {
+    username: comment.username,
+    body: comment.body
+  };
+};
+
 module.exports = {
   readCategories,
   readReview,
   readReviews,
-  readCommentsByReview
+  readCommentsByReview,
+  putCommentOnReview
 };

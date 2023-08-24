@@ -12,7 +12,8 @@ const {
     getEndpoints,
     getReview,
     getReviews,
-    getCommentsByReview
+    getCommentsByReview,
+    postComment
 } = require('./controllers');
 
 app.use(cors());
@@ -23,6 +24,7 @@ app.get('/api', getEndpoints);
 app.get('/api/reviews/:review_id', getReview);
 app.get('/api/reviews', getReviews);
 app.get('/api/reviews/:review_id/comments', getCommentsByReview);
+app.post('/api/reviews/:review_id/comments', postComment);
 
 app.all('*', handleInvalidEndpoints);
 app.use(handleCustomErrors);

@@ -291,3 +291,89 @@ describe("GET /api/reviews/:review_id/comments", () => {
     return request(app).get('/api/reviews/a/comments').expect(400);
   })
 })
+
+describe("POST /api/reviews/:review_id/comment", () => {
+  const comment = {
+    username: 'mallionaire',
+    body: 'test'
+  };
+  test("returns 201", () => {
+    return request(app).post('/api/reviews/3/comments').send(comment).expect(201);
+  })
+  test("returns an object", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(typeof result.body).toBe('object');
+  })
+  test("object has a key of comment", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(result.body.hasOwnProperty('comment')).toBe(true);
+  })
+  test("comment key has object value", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(typeof result.body.comment).toBe('object');
+  })
+  test("comment has key of username", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(result.body.comment.hasOwnProperty('username')).toBe(true);
+  })
+  test("comment has key of body", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(result.body.comment.hasOwnProperty('body')).toBe(true);
+  })
+  test("username is a string", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(typeof result.body.comment.username).toBe('string');
+  })
+  test("body is a string", async () => {
+    const result = await request(app).post('/api/reviews/3/comments').send(comment);
+    expect(typeof result.body.comment.body).toBe('string');
+  })
+  test("returns 400 when passed review id that doesn't exist", async () => {
+    const result = await request(app).post('/api/reviews/1023/comments').send(comment);
+    expect(result.status).toBe(404);
+    expect(result.body.msg).toBe("error: review with id 1023 does not exist");
+  })
+  test("returns 400 when passed an invalid review id", async () => {
+    const result = await request(app).post('/api/reviews/a/comments').send(comment);
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: review id must be a number");
+  })
+  test("returns 400 when passed object that doesn't have username prop", async () => {
+    const result = await request(app).post('/api/reviews/1/comments').send({
+      body: 'a'
+    })
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: request doesn't have 'username' property");
+  })
+  test("returns 400 when passed object that doesn't have body prop", async () => {
+    const result = await request(app).post('/api/reviews/1/comments').send({
+      username: 'a'
+    })
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: request doesn't have 'body' property");
+  })
+  test("returns 400 when username isn't a string", async () => {
+    const result = await request(app).post('/api/reviews/1/comments').send({
+      username: 1,
+      body: 'a'
+    })
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: 'username' must be a string");
+  })
+  test("returns 400 when body isn't a string", async () => {
+    const result = await request(app).post('/api/reviews/1/comments').send({
+      username: '1',
+      body: 2
+    })
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: 'body' must be a string");
+  })
+  test("returns 400 when passed username that isn't registered", async () => {
+    const result = await request(app).post('/api/reviews/2/comments').send({
+      username: 'a',
+      body: 'a'
+    });
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: user not registered");
+  })
+})
