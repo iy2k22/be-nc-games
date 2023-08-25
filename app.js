@@ -15,7 +15,8 @@ const {
     getCommentsByReview,
     postComment,
     patchReview,
-    deleteComment
+    deleteComment,
+    getUsers
 } = require('./controllers');
 
 app.use(cors());
@@ -29,6 +30,7 @@ app.get('/api/reviews/:review_id/comments', getCommentsByReview);
 app.post('/api/reviews/:review_id/comments', postComment);
 app.patch('/api/reviews/:review_id', patchReview)
 app.delete('/api/comments/:comment_id', deleteComment);
+app.get('/api/users', getUsers);
 
 app.all('*', handleInvalidEndpoints);
 app.use(handleCustomErrors);

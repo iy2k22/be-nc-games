@@ -5,7 +5,8 @@ const {
     readCommentsByReview,
     putCommentOnReview,
     changeVotes,
-    removeComment
+    removeComment,
+    readUsers
 } = require('../models');
 const resCodes = require('../res_codes.json');
 const errCodes = require('../errors/msg');
@@ -147,6 +148,15 @@ const deleteComment = async (req, res, next) => {
     }
 }
 
+const getUsers = async (req, res, next) => {
+    try {
+        const users = await readUsers();
+        res.status(200).send({ users: users });
+    } catch (e) {
+        next(e);
+    }
+}
+
 module.exports = {
     getCategories,
     getEndpoints,
@@ -155,5 +165,6 @@ module.exports = {
     getCommentsByReview,
     postComment,
     patchReview,
-    deleteComment
+    deleteComment,
+    getUsers
 }

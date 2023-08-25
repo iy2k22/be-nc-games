@@ -467,3 +467,51 @@ describe("DELETE /api/comments/:comment_id", () => {
     return request(app).delete('/api/comments/a').expect(400);
   })
 })
+
+describe.only("GET /api/users", () => {
+  test("returns 200", () => {
+    return request(app).get('/api/users').expect(200);
+  })
+  test("returns an object", async () => {
+    const result = await request(app).get('/api/users');
+    expect(typeof result.body).toBe("object");
+  })
+  test("returns an object with a key of users", async () => {
+    const result = await request(app).get('/api/users');
+    expect(result.body.hasOwnProperty('users')).toBe(true);
+  })
+  test("users is an array", async () => {
+    const result = await request(app).get('/api/users');
+    expect(Array.isArray(result.body.users)).toBe(true);
+  })
+  test("users is an array of objects", async () => {
+    const result = await request(app).get('/api/users');
+    result.body.users.forEach((user) => {
+      expect(typeof user).toBe("object");
+    })
+  })
+  test("user objects have correct properties", async () => {
+    const result = await request(app).get('/api/users');
+    result.body.users.forEach((user) => {
+      [
+        'username',
+        'name',
+        'avatar_url'
+      ].forEach((prop) => {
+        expect(user.hasOwnProperty(prop)).toBe(true);
+      })
+    })
+  })
+  test("user properties have correct types", async () => {
+    const result = await request(app).get('/api/users');
+    result.body.users.forEach((user) => {
+      [
+        'username',
+        'name',
+        'avatar_url'
+      ].forEach((prop) => {
+        expect(typeof user[prop]).toBe("string");
+      })
+    })
+  })
+})

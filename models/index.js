@@ -84,6 +84,11 @@ const removeComment = async (comment_id) => {
   await db.query(`DELETE FROM comments WHERE comment_id = $1;`, [comment_id]);
 }
 
+const readUsers = async () => {
+  const result = await db.query(`SELECT * FROM users;`);
+  return result.rows;
+}
+
 module.exports = {
   readCategories,
   readReview,
@@ -91,5 +96,6 @@ module.exports = {
   readCommentsByReview,
   putCommentOnReview,
   changeVotes,
-  removeComment
+  removeComment,
+  readUsers
 };
