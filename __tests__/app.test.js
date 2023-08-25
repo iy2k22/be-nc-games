@@ -377,3 +377,79 @@ describe("POST /api/reviews/:review_id/comment", () => {
     expect(result.body.msg).toBe("error: user not registered");
   })
 })
+
+describe("PATCH /api/reviews/:review_id", () => {
+  const votes = {
+    inc_votes: 10
+  }
+  test("returns 200", () => {
+    return request(app).patch("/api/reviews/1").send(votes).expect(200);
+  })
+  test("returns object", async () => {
+    const result = await request(app).patch("/api/reviews/1").send(votes);
+    expect(typeof result.body).toBe("object");
+  })
+  test("returned object has review property", async () => {
+    const result = await request(app).patch("/api/reviews/1").send(votes);
+    expect(result.body.hasOwnProperty('review')).toBe(true);
+  })
+  test("review property is an object", async () => {
+    const result = await request(app).patch('/api/reviews/1').send(votes);
+    expect(typeof result.body.review).toBe("object");
+  })
+  test("review object has correct properties and value types", async () => {
+    const result = await request(app).patch('/api/reviews/1').send(votes);
+    const review = result.body.review;
+    const key_types = {
+      review_id: "number",
+      title: "string",
+      category: "string",
+      designer: "string",
+      owner: "string",
+      review_body: "string",
+      review_img_url: "string",
+      created_at: "string",
+      votes: "number"
+    }
+    for (key in key_types) {
+      expect(review.hasOwnProperty(key)).toBe(true);
+      expect(typeof review[key]).toBe(key_types[key]);
+    }
+  })
+  test("returns correct review id", async () => {
+    const id = 2;
+    const result = await request(app).patch(`/api/reviews/${id}`).send(votes);
+    const review = result.body.review;
+    expect(review.review_id).toBe(id);
+  })
+  describe("vote incrementing", () => {
+    const id = 4;
+    test("votes increase when passed positive value", async () => {
+      const votes1 = (await request(app).get(`/api/reviews/${id}`)).body.review.votes;
+      const votes2 = (await request(app).patch(`/api/reviews/${id}`).send(votes)).body.review.votes;
+      expect(votes2).toBe(votes1 + votes.inc_votes);
+    })
+    test("votes decrease when passed negative value", async () => {
+      const votes1 = (await request(app).get(`/api/reviews/${id}`)).body.review.votes;
+      const votes2 = (await request(app).patch(`/api/reviews/${id}`).send({ inc_votes: -20 })).body.review.votes;
+      expect(votes2).toBe(votes1 - 20);
+    })
+    test("votes don't change when passed 0", async () => {
+      const votes1 = (await request(app).get(`/api/reviews/${id}`)).body.review.votes;
+      const votes2 = (await request(app).patch(`/api/reviews/${id}`).send({ inc_votes: 0 })).body.review.votes;
+      expect(votes2).toBe(votes1);
+    })
+  })
+  test("returns 400 when passed invalid id", () => {
+    return request(app).patch('/api/reviews/a').expect(400);
+  })
+  test("returns 400 when passed object that doesn't have inc_votes", () => {
+    return request(app).patch('/api/reviews/5').send({}).expect(400);
+  })
+  test("returns 400 when inc_votes isn't a number", () => {
+    return request(app).patch('/api/reviews/3').send({ inc_votes: 'a' }).expect(400);
+  })
+  test("returns 404 when passed a review id that doesn't exist", () => {
+    return request(app).patch('/api/reviews/998').send({ inc_votes: 2 }).expect(404);
+  })
+})

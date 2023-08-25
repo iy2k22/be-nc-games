@@ -17,7 +17,7 @@ const checkReviewExists = async (review_id) => {
 const readReview = async (review_id) => {
   const doesExist = await checkReviewExists(review_id);
   if (!doesExist)
-    return resCodes.REVIEW_NOT_FOUND;
+    return resCodes.NOT_FOUND;
   const result = await db.query(`SELECT * FROM reviews WHERE review_id=$1;`, [
     review_id,
   ]);
@@ -41,7 +41,7 @@ const readReviews = async () => {
 const readCommentsByReview = async (review_id) => {
   const doesExist = await checkReviewExists(review_id);
   if (!doesExist)
-    return resCodes.REVIEW_NOT_FOUND;
+    return resCodes.NOT_FOUND;
   const result = await db.query(`SELECT * FROM comments WHERE review_id=$1 ORDER BY created_at desc;`, [review_id]);
   if (!result.rows.length)
     return resCodes.NO_COMMENTS_FOR_REVIEW;
@@ -50,7 +50,7 @@ const readCommentsByReview = async (review_id) => {
 
 const putCommentOnReview = async (comment) => {
   const doesExist = await checkReviewExists(comment.review_id);
-  if (!doesExist) return resCodes.REVIEW_NOT_FOUND;
+  if (!doesExist) return resCodes.NOT_FOUND;
   await db.query(
     `INSERT INTO comments (body, author, review_id)
   VALUES ($1, $2, $3);`,
@@ -62,10 +62,27 @@ const putCommentOnReview = async (comment) => {
   };
 };
 
+const changeVotes = async (review_id, votes) => {
+  const doesExist = await checkReviewExists(review_id);
+  if (!doesExist) return resCodes.NOT_FOUND;
+  let sign = '+';
+  if (votes < 0) {
+    sign = '-';
+    votes *= -1;
+  }
+  const query = `UPDATE reviews
+  SET votes=votes${sign}$1
+  WHERE review_id=$2
+  RETURNING *;`
+  const result = await db.query(query, [votes, review_id]);
+  return result.rows[0];
+}
+
 module.exports = {
   readCategories,
   readReview,
   readReviews,
   readCommentsByReview,
-  putCommentOnReview
+  putCommentOnReview,
+  changeVotes
 };

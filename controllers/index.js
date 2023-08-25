@@ -3,9 +3,11 @@ const {
     readReview,
     readReviews,
     readCommentsByReview,
-    putCommentOnReview
+    putCommentOnReview,
+    changeVotes
 } = require('../models');
 const resCodes = require('../res_codes.json');
+const errCodes = require('../errors/msg');
 
 const getCategories = async (req, res, next) => {
     try {
@@ -23,13 +25,13 @@ const getEndpoints = async (req, res) => {
 const getReview = async (req, res, next) => {
     const review_id = Number.parseInt(req.params.review_id);
     if (!review_id) {
-        next({ status: 400, msg: "error: review id must be a number" });
+        next(errCodes.INVALID_ID('review'));
         return;
     }
     try {
         const result = await readReview(review_id);
-        if (result === resCodes.REVIEW_NOT_FOUND)
-            next({ status: 404, msg: `error: review with id ${review_id} does not exist` });
+        if (result === resCodes.NOT_FOUND)
+            next(errCodes.NOT_FOUND(review_id, 'review'));
         else
             res.status(200).send({ review: result[0] });
     } catch (e) {
@@ -49,17 +51,17 @@ const getReviews = async (req, res, next) => {
 const getCommentsByReview = async (req, res, next) => {
     const review_id = Number.parseInt(req.params.review_id);
     if (!review_id) {
-        next({ status: 400, msg: `error: review id must be a number`});
+        next(errCodes.INVALID_ID('review'));
         return;
     }
     try {
         const result = await readCommentsByReview(review_id);
         switch (result) {
-            case resCodes.REVIEW_NOT_FOUND:
-                next({ status: 404, msg: `error: review with id ${review_id} does not exist` });
+            case resCodes.NOT_FOUND:
+                next(errCodes.NOT_FOUND(review_id, 'review'));
                 break;
             case resCodes.NO_COMMENTS_FOR_REVIEW:
-                next({ status: 404, msg: `error: no comments for review with id ${review_id}` });
+                next(errCodes.NO_COMMENTS_FOR_REVIEW(review_id));
                 break;
             default:
                 res.status(200).send({ comments: result });
@@ -73,28 +75,54 @@ const getCommentsByReview = async (req, res, next) => {
 const postComment = async (req, res, next) => {
     const review_id = Number.parseInt(req.params.review_id);
     if (!review_id) {
-        next({ status: 400, msg: 'error: review id must be a number' });
+        next(errCodes.INVALID_ID('review'));
         return;
     }
+    for (let prop of ['username', 'body'])
+        if (!(req.body.hasOwnProperty(prop))) {
+            next(errCodes.DOES_NOT_HAVE_PROP(prop));
+            return;
+        } else if (typeof req.body[prop] !== 'string') {
+            next(errCodes.INVALID_TYPE(prop, 'string'));
+            return;
+        }
     try {
-        for (let prop of ['username', 'body'])
-            if (!(req.body.hasOwnProperty(prop))) {
-                next({ status: 400, msg: `error: request doesn't have '${prop}' property` });
-                return;
-            } else if (typeof req.body[prop] !== 'string') {
-                next({ status: 400, msg: `error: '${prop}' must be a string` });
-                return;
-            }
         const result = await putCommentOnReview({
             username: req.body.username,
             body: req.body.body,
             review_id: review_id
         });
-        if (result === resCodes.REVIEW_NOT_FOUND) {
-            next({ status: 404, msg: `error: review with id ${review_id} does not exist` });
+        if (result === resCodes.NOT_FOUND) {
+            next(errCodes.NOT_FOUND(review_id, 'review'));
             return;
         }
         res.status(201).send({ comment: result });
+    } catch (e) {
+        next(e);
+    }
+}
+
+const patchReview = async (req, res, next) => {
+    const review_id = Number.parseInt(req.params.review_id);
+    if (!review_id) {
+        next(errCodes.INVALID_ID('review'));
+        return;
+    }
+    if (!(req.body.hasOwnProperty('inc_votes'))) {
+        next(errCodes.DOES_NOT_HAVE_PROP('inc_votes'));
+        return;
+    }
+    if (typeof req.body.inc_votes !== 'number') {
+        next(errCodes.INVALID_TYPE('inc_votes', 'number'));
+        return;
+    }
+    try {
+        const result = await changeVotes(review_id, req.body.inc_votes);
+        if (result === resCodes.NOT_FOUND) {
+            next(errCodes.NOT_FOUND(review_id, 'review'));
+            return;
+        }
+        res.status(200).send({ review: result });
     } catch (e) {
         next(e);
     }
@@ -106,5 +134,6 @@ module.exports = {
     getReview,
     getReviews,
     getCommentsByReview,
-    postComment
+    postComment,
+    patchReview
 }
