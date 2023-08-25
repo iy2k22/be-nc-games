@@ -6,16 +6,16 @@ const readCategories = async () => {
   return result.rows;
 };
 
-const checkReviewExists = async (review_id) => {
+const checkExists = async (id, type) => {
   const doesExist = await db.query(
-    `SELECT review_id FROM reviews WHERE review_id=$1;`,
-    [review_id]
+    `SELECT ${type}_id FROM ${type}s WHERE ${type}_id=$1;`,
+    [id]
   );
   return Boolean(doesExist.rows[0]);
 };
 
 const readReview = async (review_id) => {
-  const doesExist = await checkReviewExists(review_id);
+  const doesExist = await checkExists(review_id, 'review');
   if (!doesExist)
     return resCodes.NOT_FOUND;
   const result = await db.query(`SELECT * FROM reviews WHERE review_id=$1;`, [
@@ -39,7 +39,7 @@ const readReviews = async () => {
 };
 
 const readCommentsByReview = async (review_id) => {
-  const doesExist = await checkReviewExists(review_id);
+  const doesExist = await checkExists(review_id, 'review');
   if (!doesExist)
     return resCodes.NOT_FOUND;
   const result = await db.query(`SELECT * FROM comments WHERE review_id=$1 ORDER BY created_at desc;`, [review_id]);
@@ -49,7 +49,7 @@ const readCommentsByReview = async (review_id) => {
 }
 
 const putCommentOnReview = async (comment) => {
-  const doesExist = await checkReviewExists(comment.review_id);
+  const doesExist = await checkExists(comment.review_id, 'review');
   if (!doesExist) return resCodes.NOT_FOUND;
   await db.query(
     `INSERT INTO comments (body, author, review_id)
@@ -63,7 +63,7 @@ const putCommentOnReview = async (comment) => {
 };
 
 const changeVotes = async (review_id, votes) => {
-  const doesExist = await checkReviewExists(review_id);
+  const doesExist = await checkExists(review_id, 'review');
   if (!doesExist) return resCodes.NOT_FOUND;
   let sign = '+';
   if (votes < 0) {
@@ -78,11 +78,18 @@ const changeVotes = async (review_id, votes) => {
   return result.rows[0];
 }
 
+const removeComment = async (comment_id) => {
+  const doesExist = await checkExists(comment_id, 'comment');
+  if (!doesExist) return resCodes.NOT_FOUND;
+  await db.query(`DELETE FROM comments WHERE comment_id = $1;`, [comment_id]);
+}
+
 module.exports = {
   readCategories,
   readReview,
   readReviews,
   readCommentsByReview,
   putCommentOnReview,
-  changeVotes
+  changeVotes,
+  removeComment
 };

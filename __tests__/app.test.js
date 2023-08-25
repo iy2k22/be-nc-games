@@ -453,3 +453,14 @@ describe("PATCH /api/reviews/:review_id", () => {
     return request(app).patch('/api/reviews/998').send({ inc_votes: 2 }).expect(404);
   })
 })
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("returns 204 and doesn't send an object", async () => {
+    const result = await request(app).delete('/api/comments/5');
+    expect(result.status).toBe(204);
+    expect(result.body).toEqual({});
+  })
+  test("returns 404 when passed a review that doesn't exist", async () => {
+    return request(app).delete('/api/comments/13').expect(404);
+  })
+})

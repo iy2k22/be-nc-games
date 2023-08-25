@@ -4,7 +4,8 @@ const {
     readReviews,
     readCommentsByReview,
     putCommentOnReview,
-    changeVotes
+    changeVotes,
+    removeComment
 } = require('../models');
 const resCodes = require('../res_codes.json');
 const errCodes = require('../errors/msg');
@@ -128,6 +129,24 @@ const patchReview = async (req, res, next) => {
     }
 }
 
+const deleteComment = async (req, res, next) => {
+    const comment_id = Number.parseInt(req.params.comment_id);
+    if (!comment_id) {
+        next(errCodes.INVALID_ID('comment'));
+        return;
+    }
+    try {
+        const result = await removeComment(comment_id);
+        if (result === resCodes.NOT_FOUND) {
+            next(errCodes.NOT_FOUND('comment'));
+            return;
+        }
+        res.status(204).send();
+    } catch (e) {
+        next(e);
+    }
+}
+
 module.exports = {
     getCategories,
     getEndpoints,
@@ -135,5 +154,6 @@ module.exports = {
     getReviews,
     getCommentsByReview,
     postComment,
-    patchReview
+    patchReview,
+    deleteComment
 }
