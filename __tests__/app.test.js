@@ -463,4 +463,7 @@ describe("DELETE /api/comments/:comment_id", () => {
   test("returns 404 when passed a review that doesn't exist", async () => {
     return request(app).delete('/api/comments/13').expect(404);
   })
+  test("returns 400 when passed invalid review id", () => {
+    return request(app).delete('/api/comments/a').expect(400);
+  })
 })
