@@ -42,8 +42,25 @@ const getReview = async (req, res, next) => {
 }
 
 const getReviews = async (req, res, next) => {
+    const params = {
+        category: undefined,
+        sort_by: undefined,
+        order: undefined
+    }
+    if (Object.keys(params).length !== 0)
+        for (let prop in params)
+            if (req.query.hasOwnProperty(prop))
+                if (typeof req.query[prop] !== 'string') {
+                    next(errCodes.INVALID_TYPE(prop, 'string'));
+                    return;
+                } else
+                    params[prop] = req.query[prop];
     try {
-        const reviewData = await readReviews();
+        const reviewData = await readReviews(category = params.category, sort_by = params.sort_by, order = params.order);
+        if (reviewData === resCodes.NO_REVIEWS) {
+            next(errCodes.NO_REVIEWS);
+            return;
+        }
         res.status(200).send({ reviews: reviewData });
     } catch (e) {
         next(e);

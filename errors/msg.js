@@ -29,4 +29,8 @@ module.exports = {
       msg: `error: '${prop}' must be a ${type}`,
     };
   },
+  NO_REVIEWS: {
+    status: 404,
+    msg: 'error: no reviews found'
+  }
 };

@@ -1,5 +1,6 @@
 {
     "NOT_FOUND": 0,
     "NO_COMMENTS_FOR_REVIEW": 1,
-    "USER_NOT_REGISTERED": 2
+    "USER_NOT_REGISTERED": 2,
+    "NO_REVIEWS": 3
 }

@@ -8,17 +8,16 @@ const handleCustomErrors = (err, req, res, next) => {
 }
 
 const handlePsqlErrors = (err, req, res, next) => {
-    switch (err.code) {
-        case '22P02':
-            res.status(400).send({ msg: 'error: invalid input' });
-            break;
-        case '23503':
-            res.status(400).send({ msg: 'error: user not registered'});
-            break;
-        default:
-            next(err);
-            break;
-    }
+    const code_responses = {
+        '22P02': 'invalid input',
+        '23503': 'user not registered',
+        '42703': 'column does not exist',
+        '42601': 'syntax error'
+    };
+    if (Object.keys(code_responses).includes(err.code))
+        res.status(400).send({ msg: `error: ${code_responses[err.code]}` });
+    else
+        next(err);
 }
 
 const handle500Errors = (err, req, res) => {

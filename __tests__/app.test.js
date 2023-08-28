@@ -468,7 +468,7 @@ describe("DELETE /api/comments/:comment_id", () => {
   })
 })
 
-describe.only("GET /api/users", () => {
+describe("GET /api/users", () => {
   test("returns 200", () => {
     return request(app).get('/api/users').expect(200);
   })
@@ -513,5 +513,31 @@ describe.only("GET /api/users", () => {
         expect(typeof user[prop]).toBe("string");
       })
     })
+  })
+})
+
+describe.only("GET /api/reviews (queries)", () => {
+  test("returns 200", () => {
+    return request(app).get('/api/reviews?category=dexterity').expect(200);
+  })
+  test("returns reviews of type passed in", async () => {
+    const result = await request(app).get('/api/reviews?category=dexterity');
+    const allReviews = await request(app).get('/api/reviews');
+    expect(result.body.reviews).toEqual(allReviews.body.reviews.filter((review) => review.category === 'dexterity'));
+  })
+  test("returns 400 when passed in category that isn't a string", async () => {
+    const result = await request(app).get('/api/reviews?sort_by=2020');
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: syntax error");
+  })
+  test("returns 404 when there are no reviews", async () => {
+    const result = await request(app).get('/api/reviews?category=a&sort_by=review_id');
+    expect(result.status).toBe(404);
+    expect(result.body.msg).toBe("error: no reviews found");
+  })
+  test("returns 400 when sort by column doesn't exist", async () => {
+    const result = await request(app).get('/api/reviews?sort_by=x');
+    expect(result.status).toBe(400);
+    expect(result.body.msg).toBe("error: column doesn't exist");
   })
 })
