@@ -17,10 +17,16 @@ const checkExists = async (id, type) => {
 const readReview = async (review_id) => {
   const doesExist = await checkExists(review_id, "review");
   if (!doesExist) return resCodes.NOT_FOUND;
-  const result = await db.query(`SELECT * FROM reviews WHERE review_id=$1;`, [
+  const result = await db.query(`SELECT reviews.*, COUNT(comments.comment_id) AS comment_count
+  FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id
+  WHERE reviews.review_id=$1
+  GROUP BY reviews.review_id
+  ORDER BY reviews.review_id asc;`, [
     review_id,
   ]);
-  return result.rows;
+  const newResult = {...(result.rows[0])};
+  newResult.comment_count = Number(newResult.comment_count);
+  return newResult;
 };
 
 const readReviews = async (

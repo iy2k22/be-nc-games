@@ -35,7 +35,7 @@ const getReview = async (req, res, next) => {
         if (result === resCodes.NOT_FOUND)
             next(errCodes.NOT_FOUND(review_id, 'review'));
         else
-            res.status(200).send({ review: result[0] });
+            res.status(200).send({ review: result });
     } catch (e) {
         next(e);
     }

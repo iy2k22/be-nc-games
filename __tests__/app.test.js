@@ -516,7 +516,7 @@ describe("GET /api/users", () => {
   })
 })
 
-describe.only("GET /api/reviews (queries)", () => {
+describe("GET /api/reviews (queries)", () => {
   test("returns 200", () => {
     return request(app).get('/api/reviews?category=dexterity').expect(200);
   })
@@ -538,6 +538,28 @@ describe.only("GET /api/reviews (queries)", () => {
   test("returns 400 when sort by column doesn't exist", async () => {
     const result = await request(app).get('/api/reviews?sort_by=x');
     expect(result.status).toBe(400);
-    expect(result.body.msg).toBe("error: column doesn't exist");
+    expect(result.body.msg).toBe("error: column does not exist");
+  })
+})
+
+describe.only("GET /api/reviews/:review_id (comment count)", () => {
+  test("returns 200", () => {
+    return request(app).get('/api/reviews/1').expect(200);
+  })
+  test("review has a property of comment count", async () => {
+    const result = await request(app).get('/api/reviews/1');
+    expect(result.body.review.hasOwnProperty('comment_count')).toBe(true);
+  })
+  test("comment count is a number", async () => {
+    const result = await request(app).get('/api/reviews/1');
+    expect(typeof result.body.review.comment_count).toBe("number");
+  })
+  test("review 3 has 3 comments", async () => {
+    const result = await request(app).get('/api/reviews/3');
+    expect(result.body.review.comment_count).toBe(3);
+  })
+  test("review without comments has a comment count of 0", async () => {
+    const result = await request(app).get('/api/reviews/1');
+    expect(result.body.review.comment_count).toBe(0);
   })
 })
