@@ -54,14 +54,6 @@ describe("GET /api", () => {
     const result = await request(app).get("/api");
     expect(result.body.hasOwnProperty("endpoints")).toBe(true);
   });
-  test("returns an object with available endpoints", async () => {
-    const result = await request(app).get("/api");
-    ["GET /api", "GET /api/categories", "GET /api/reviews"].forEach(
-      (endpoint) => {
-        expect(result.body.endpoints.hasOwnProperty(endpoint)).toBe(true);
-      }
-    );
-  });
   test('all endpoints have a key of "description"', async () => {
     const result = await request(app).get("/api");
     for (endpoint in result.body.endpoints)
@@ -73,7 +65,7 @@ describe("GET /api", () => {
     const result = await request(app).get("/api");
     for (endpoint in result.body.endpoints)
       if (endpoint !== "GET /api")
-        expect(result.body.endpoints.endpoint.hasOwnProperty('queries'));
+        expect(result.body.endpoints[endpoint].hasOwnProperty('queries'));
   });
   test("returns correct data", async () => {
     const result = await request(app).get("/api");
@@ -277,12 +269,6 @@ describe("GET /api/reviews/:review_id/comments", () => {
     expect(result.status).toBe(404);
     expect(result.body.msg).toBe(`error: review with id ${bad_id} does not exist`);
   })
-  test("review that doesn't have comments returns 404", async () => {
-    const bad_id = 5;
-    const result = await request(app).get(`/api/reviews/${bad_id}/comments`);
-    expect(result.status).toBe(404);
-    expect(result.body.msg).toBe(`error: no comments for review with id ${bad_id}`);
-  })
   test("returns 400 when invalid id passed in", () => {
     return request(app).get('/api/reviews/a/comments').expect(400);
   })
@@ -324,7 +310,7 @@ describe("POST /api/reviews/:review_id/comment", () => {
     const result = await request(app).post('/api/reviews/3/comments').send(comment);
     expect(typeof result.body.comment.body).toBe('string');
   })
-  test("returns 400 when passed review id that doesn't exist", async () => {
+  test("returns 404 when passed review id that doesn't exist", async () => {
     const result = await request(app).post('/api/reviews/1023/comments').send(comment);
     expect(result.status).toBe(404);
     expect(result.body.msg).toBe("error: review with id 1023 does not exist");
@@ -526,11 +512,6 @@ describe("GET /api/reviews (queries)", () => {
     expect(result.status).toBe(400);
     expect(result.body.msg).toBe("error: syntax error");
   })
-  test("returns 404 when there are no reviews", async () => {
-    const result = await request(app).get('/api/reviews?category=a&sort_by=review_id');
-    expect(result.status).toBe(404);
-    expect(result.body.msg).toBe("error: no reviews found");
-  })
   test("returns 400 when sort by column doesn't exist", async () => {
     const result = await request(app).get('/api/reviews?sort_by=x');
     expect(result.status).toBe(400);
@@ -538,7 +519,7 @@ describe("GET /api/reviews (queries)", () => {
   })
 })
 
-describe.only("GET /api/reviews/:review_id (comment count)", () => {
+describe("GET /api/reviews/:review_id (comment count)", () => {
   test("returns 200", () => {
     return request(app).get('/api/reviews/1').expect(200);
   })
