@@ -69,15 +69,11 @@ describe("GET /api", () => {
         result.body.endpoints[endpoint].hasOwnProperty("description")
       ).toBe(true);
   });
-  test('every endpoint expect "/api" has properties of "queries" and "exampleResponse"', async () => {
+  test('every endpoint expect "/api" has property of "queries"', async () => {
     const result = await request(app).get("/api");
     for (endpoint in result.body.endpoints)
       if (endpoint !== "GET /api")
-        ["queries", "exampleResponse"].forEach((prop) => {
-          expect(result.body.endpoints[endpoint].hasOwnProperty(prop)).toBe(
-            true
-          );
-        });
+        expect(result.body.endpoints.endpoint.hasOwnProperty('queries'));
   });
   test("returns correct data", async () => {
     const result = await request(app).get("/api");

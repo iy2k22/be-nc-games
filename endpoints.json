@@ -31,5 +31,116 @@
         }
       ]
     }
+  },
+  "GET /api/reviews/:review_id": {
+    "description": "serves a review with requested id",
+    "queries": [],
+    "exampleResponse": {
+      "review": {
+        "review_id": 3,
+        "title": "Ultimate Werewolf",
+        "category": "social deduction",
+        "designer": "Akihisa Okui",
+        "owner": "bainesface",
+        "review_body": "We couldn't find the werewolf!",
+        "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700",
+        "created_at": "2021-01-18T10:01:41.251Z",
+        "votes": 5,
+        "comment_count": 3
+      }
+    }
+  },
+  "GET /api/reviews/:review_id/comments": {
+    "description": "Gets all comments posted under a specified review id",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 6,
+          "body": "Not sure about dogs, but my cat likes to get involved with board games, the boxes are their particular favourite",
+          "review_id": 3,
+          "author": "philippaclaire9",
+          "votes": 10,
+          "created_at": "2021-03-27T19:49:48.110Z"
+        },
+        {
+          "comment_id": 3,
+          "body": "I didn't know dogs could play games",
+          "review_id": 3,
+          "author": "philippaclaire9",
+          "votes": 10,
+          "created_at": "2021-01-18T10:09:48.110Z"
+        },
+        {
+          "comment_id": 2,
+          "body": "My dog loved this game too!",
+          "review_id": 3,
+          "author": "mallionaire",
+          "votes": 13,
+          "created_at": "2021-01-18T10:09:05.410Z"
+        }
+      ]
+    }
+  },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "Posts a comment with specified username and body",
+    "queries": [],
+    "bodyProps": [ "username", "body" ],
+    "exampleResponse": {
+      "comment": {
+        "username": "mallionaire",
+        "body": "b"
+      }
+    }
+  },
+  "PATCH /api/reviews/:review_id": {
+    "description": "Changes votes for specified review by specified number",
+    "queries": [],
+    "bodyProps": [ "inc_votes" ],
+    "exampleResponse": {
+      "review": {
+        "review_id": 3,
+        "title": "Ultimate Werewolf",
+        "category": "social deduction",
+        "designer": "Akihisa Okui",
+        "owner": "bainesface",
+        "review_body": "We couldn't find the werewolf!",
+        "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700",
+        "created_at": "2021-01-18T10:01:41.251Z",
+        "votes": 15
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "Deletes given comment",
+    "queries": []
+  },
+  "GET /api/users": {
+    "description": "Serves a list of all registered users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "mallionaire",
+          "name": "haz",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "philippaclaire9",
+          "name": "philippa",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        },
+        {
+          "username": "bainesface",
+          "name": "sarah",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        },
+        {
+          "username": "dav3rid",
+          "name": "dave",
+          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        }
+      ]
+    }
   }
 }
