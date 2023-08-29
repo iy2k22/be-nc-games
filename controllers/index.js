@@ -57,10 +57,6 @@ const getReviews = async (req, res, next) => {
                     params[prop] = req.query[prop];
     try {
         const reviewData = await readReviews(category = params.category, sort_by = params.sort_by, order = params.order);
-        if (reviewData === resCodes.NO_REVIEWS) {
-            next(errCodes.NO_REVIEWS);
-            return;
-        }
         res.status(200).send({ reviews: reviewData });
     } catch (e) {
         next(e);
@@ -78,9 +74,6 @@ const getCommentsByReview = async (req, res, next) => {
         switch (result) {
             case resCodes.NOT_FOUND:
                 next(errCodes.NOT_FOUND(review_id, 'review'));
-                break;
-            case resCodes.NO_COMMENTS_FOR_REVIEW:
-                next(errCodes.NO_COMMENTS_FOR_REVIEW(review_id));
                 break;
             default:
                 res.status(200).send({ comments: result });

@@ -41,7 +41,6 @@ const readReviews = async (
   GROUP BY reviews.review_id
   ORDER BY reviews.${sort_by} ${order};`
   const result = category ? await db.query(query, [category]) : await db.query(query);
-  if (!(result.rows[0])) return resCodes.NO_REVIEWS;
   return result.rows.map((review) => {
     const newReview = { ...review };
     newReview.comment_count = Number(newReview.comment_count);
@@ -56,7 +55,6 @@ const readCommentsByReview = async (review_id) => {
     `SELECT * FROM comments WHERE review_id=$1 ORDER BY created_at desc;`,
     [review_id]
   );
-  if (!result.rows.length) return resCodes.NO_COMMENTS_FOR_REVIEW;
   return result.rows;
 };
 
