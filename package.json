@@ -7,8 +7,7 @@
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
     "test": "jest",
-    "prepare": "husky install",
-    "test-app": "NODE_ENV=development npm run test app"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
