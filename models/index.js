@@ -39,7 +39,7 @@ const readReviews = async (
   FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id
   ${category ? 'WHERE reviews.category = $1' : ''}
   GROUP BY reviews.review_id
-  ORDER BY reviews.${sort_by} ${order};`
+  ORDER BY ${sort_by} ${order};`
   const result = category ? await db.query(query, [category]) : await db.query(query);
   return result.rows.map((review) => {
     const newReview = { ...review };

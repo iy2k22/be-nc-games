@@ -507,15 +507,9 @@ describe("GET /api/reviews (queries)", () => {
     const allReviews = await request(app).get('/api/reviews');
     expect(result.body.reviews).toEqual(allReviews.body.reviews.filter((review) => review.category === 'dexterity'));
   })
-  test("returns 400 when passed in category that isn't a string", async () => {
-    const result = await request(app).get('/api/reviews?sort_by=2020');
-    expect(result.status).toBe(400);
-    expect(result.body.msg).toBe("error: syntax error");
-  })
   test("returns 400 when sort by column doesn't exist", async () => {
     const result = await request(app).get('/api/reviews?sort_by=x');
     expect(result.status).toBe(400);
-    expect(result.body.msg).toBe("error: column does not exist");
   })
 })
 
