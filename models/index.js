@@ -16,10 +16,12 @@ const checkExists = async (id, type) => {
 
 const formatNo = (num) => `${num < 10 ? '0' : ''}${num}`;
 
+const formatDate = (date) => `${formatNo(date.getDate())}/${formatNo(date.getMonth() + 1)}/${date.getFullYear()}`;
+
 const formatReview = (review) => {
   const newReview = { ...review };
   newReview.comment_count = Number(newReview.comment_count);
-  newReview.display_date = `${formatNo(newReview.created_at.getDate())}/${formatNo(newReview.created_at.getMonth() + 1)}/${newReview.created_at.getFullYear()}`;
+  newReview.display_date = formatDate(newReview.created_at);
   return newReview;
 }
 
@@ -58,7 +60,11 @@ const readCommentsByReview = async (review_id) => {
     `SELECT * FROM comments WHERE review_id=$1 ORDER BY created_at desc;`,
     [review_id]
   );
-  return result.rows;
+  return result.rows.map((comment) => {
+    const newComment = {...comment};
+    newComment.display_date = formatDate(newComment.created_at);
+    return newComment;
+  });
 };
 
 const putCommentOnReview = async (comment) => {

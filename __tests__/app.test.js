@@ -246,7 +246,8 @@ describe("GET /api/reviews/:review_id/comments", () => {
         "created_at",
         "author",
         "body",
-        "review_id"
+        "review_id",
+        "display_date"
       ].forEach((prop) => {
         expect(comment.hasOwnProperty(prop)).toBe(true);
       })
@@ -261,6 +262,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
       expect(typeof comment.author).toBe("string");
       expect(typeof comment.body).toBe("string");
       expect(typeof comment.review_id).toBe("number");
+      expect(typeof comment.display_date).toBe("string");
     })
   })
   test("review id is correct", async () => {
