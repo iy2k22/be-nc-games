@@ -3,7 +3,15 @@ const resCodes = require("../res_codes.json");
 
 const readCategories = async () => {
   const result = await db.query(`SELECT * FROM categories;`);
-  return result.rows;
+  return result.rows.map((category) => {
+    const newCategory = {...category};
+    newCategory.display_name = newCategory.slug.split('-').map((word) => {
+      const newWord = word.split('');
+      newWord[0] = newWord[0].toUpperCase();
+      return newWord.join('');
+    }).join(' ');
+    return newCategory;
+  });
 };
 
 const checkExists = async (id, type) => {

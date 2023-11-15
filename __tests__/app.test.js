@@ -26,23 +26,29 @@ describe("GET /api/categories", () => {
     const result = await request(app).get("/api/categories");
     expect(Array.isArray(result.body.categories)).toBe(true);
   });
-  test('categories element contains keys "slug" and "description"', async () => {
+  test('categories element contains keys "slug", "description" and "display_name"', async () => {
     const result = await request(app).get("/api/categories");
     result.body.categories.forEach((category) => {
       expect(category.hasOwnProperty("slug")).toBe(true);
       expect(category.hasOwnProperty("description")).toBe(true);
+      expect(category.hasOwnProperty("display_name")).toBe(true);
     });
   });
-  test('"slug" and "description" keys have string values', async () => {
+  test('all 3 keys have string values', async () => {
     const result = await request(app).get("/api/categories");
     result.body.categories.forEach((category) => {
       expect(typeof category.slug).toBe("string");
       expect(typeof category.description).toBe("string");
+      expect(typeof category.display_name).toBe("string");
     });
   });
   test("returns correct data", async () => {
     const result = await request(app).get("/api/categories");
-    expect(result.body.categories).toEqual(testData.categoryData);
+    expect(result.body.categories.map((category) => {
+      const newCategory = {...category};
+      delete newCategory.display_name;
+      return newCategory;
+    })).toEqual(testData.categoryData);
   });
 });
 
