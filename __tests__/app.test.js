@@ -97,6 +97,7 @@ describe("GET /api/reviews/:review_id", () => {
       "category",
       "owner",
       "created_at",
+      "display_date"
     ].forEach((prop) => {
       expect(result.body.review.hasOwnProperty(prop)).toBe(true);
     });
@@ -138,6 +139,10 @@ describe("GET /api/reviews/:review_id", () => {
       const result = await request(app).get("/api/reviews/3");
       expect(typeof result.body.review.created_at).toBe("string");
     });
+    test("display_date is a string", async () => {
+      const result = await request(app).get('/api/reviews/3');
+      expect(typeof result.body.review.display_date).toBe("string");
+    })
   });
   test("returns 400 if an id that is not a number is passed in", async () => {
     return request(app).get("/api/reviews/test").expect(400);
@@ -181,7 +186,8 @@ describe("GET /api/reviews", () => {
         'created_at',
         'votes',
         'designer',
-        'comment_count'
+        'comment_count',
+        'display_date'
       ].forEach((prop) => {
         expect(review.hasOwnProperty(prop)).toBe(true);
       })

@@ -14,6 +14,15 @@ const checkExists = async (id, type) => {
   return Boolean(doesExist.rows[0]);
 };
 
+const formatNo = (num) => `${num < 10 && '0'}${num}`;
+
+const formatReview = (review) => {
+  const newReview = { ...review };
+  newReview.comment_count = Number(newReview.comment_count);
+  newReview.display_date = `${formatNo(newReview.created_at.getDate())}/${formatNo(newReview.created_at.getMonth())}/${newReview.created_at.getFullYear()}`;
+  return newReview;
+}
+
 const readReview = async (review_id) => {
   const doesExist = await checkExists(review_id, "review");
   if (!doesExist) return resCodes.NOT_FOUND;
@@ -24,9 +33,7 @@ const readReview = async (review_id) => {
   ORDER BY reviews.review_id asc;`, [
     review_id,
   ]);
-  const newResult = {...(result.rows[0])};
-  newResult.comment_count = Number(newResult.comment_count);
-  return newResult;
+  return formatReview(result.rows[0]);
 };
 
 const readReviews = async (
@@ -41,11 +48,7 @@ const readReviews = async (
   GROUP BY reviews.review_id
   ORDER BY ${sort_by} ${order};`
   const result = category ? await db.query(query, [category]) : await db.query(query);
-  return result.rows.map((review) => {
-    const newReview = { ...review };
-    newReview.comment_count = Number(newReview.comment_count);
-    return newReview;
-  })
+  return result.rows.map((review) => formatReview(review));
 };
 
 const readCommentsByReview = async (review_id) => {
