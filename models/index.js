@@ -14,7 +14,7 @@ const checkExists = async (id, type) => {
   return Boolean(doesExist.rows[0]);
 };
 
-const formatNo = (num) => `${num < 10 && '0'}${num}`;
+const formatNo = (num) => `${num < 10 ? '0' : null}${num}`;
 
 const formatReview = (review) => {
   const newReview = { ...review };
