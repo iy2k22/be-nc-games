@@ -14,12 +14,12 @@ const checkExists = async (id, type) => {
   return Boolean(doesExist.rows[0]);
 };
 
-const formatNo = (num) => `${num < 10 ? '0' : null}${num}`;
+const formatNo = (num) => `${num < 10 ? '0' : ''}${num}`;
 
 const formatReview = (review) => {
   const newReview = { ...review };
   newReview.comment_count = Number(newReview.comment_count);
-  newReview.display_date = `${formatNo(newReview.created_at.getDate())}/${formatNo(newReview.created_at.getMonth())}/${newReview.created_at.getFullYear()}`;
+  newReview.display_date = `${formatNo(newReview.created_at.getDate())}/${formatNo(newReview.created_at.getMonth() + 1)}/${newReview.created_at.getFullYear()}`;
   return newReview;
 }
 
