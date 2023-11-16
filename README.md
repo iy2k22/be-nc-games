@@ -12,6 +12,7 @@ This is the backend part of my Northcoders website. It connects with a database 
 First, clone the repository.
 ```sh
 git clone https://github.com/iy2k22/be-nc-games
+cd be-nc-games
 ```
 Then, you'll want to change directory to the root of the project and install its dependencies.
 ```sh
